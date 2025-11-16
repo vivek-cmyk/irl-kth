@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DIMENSION_ORDER, DIMENSION_LABELS, DIMENSION_SUMMARY, IRL_DEFINITIONS } from "@/data/irlDefinitions";
+import { DIMENSION_ORDER, DIMENSION_LABELS } from "@/data/irlDefinitions";
 import { DimensionId, DimensionState, SummaryReport } from "@/types/irl";
+import { RadarChartView } from "@/components/irl/RadarChartView";
+import { DimensionCard } from "@/components/irl/DimensionCard";
+import { IRL_DEFINITIONS } from "@/data/irlDefinitions";
 
 const IrlAssessment = () => {
   const [assessmentDate, setAssessmentDate] = useState<string>(
@@ -79,25 +80,9 @@ const IrlAssessment = () => {
       );
       recommendedFocus.push(`Focus on: ${nextLevel.description}`);
       
-      // Add dimension-specific actions
-      if (bottleneckDim.dimension === "CRL") {
-        recommendedFocus.push("Conduct more customer interviews and gather feedback");
-        recommendedFocus.push("Test your value proposition with target segments");
-      } else if (bottleneckDim.dimension === "TRL") {
-        recommendedFocus.push("Advance prototype development and testing");
-        recommendedFocus.push("Validate technical feasibility in realistic conditions");
-      } else if (bottleneckDim.dimension === "BRL") {
-        recommendedFocus.push("Refine your business model and revenue streams");
-        recommendedFocus.push("Test pricing and cost assumptions");
-      } else if (bottleneckDim.dimension === "IPRL") {
-        recommendedFocus.push("Conduct freedom-to-operate analysis");
-        recommendedFocus.push("Consider filing key IP applications");
-      } else if (bottleneckDim.dimension === "TMRL") {
-        recommendedFocus.push("Identify and recruit missing competencies");
-        recommendedFocus.push("Clarify roles and commitment within the team");
-      } else if (bottleneckDim.dimension === "FRL") {
-        recommendedFocus.push("Develop and test your funding pitch");
-        recommendedFocus.push("Identify and approach relevant funding sources");
+      // Add specific indicators from next level
+      if (nextLevel.indicators && nextLevel.indicators.length > 0) {
+        recommendedFocus.push(...nextLevel.indicators.slice(0, 3));
       }
     }
 
@@ -113,7 +98,7 @@ const IrlAssessment = () => {
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-5xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-foreground">IRL Assessment & Summary</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -121,6 +106,22 @@ const IrlAssessment = () => {
             Nothing is saved; copy the result into your own tracker if you want to keep it.
           </p>
         </div>
+
+        {/* Current Assessment Radar Chart */}
+        {dimensions.some(d => d.level > 0) && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Assessment Overview</CardTitle>
+              <CardDescription>Visual representation of your IRL assessment</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RadarChartView 
+                dimensions={dimensions.map(d => ({ dimension: d.dimension, level: d.level }))} 
+                size="small"
+              />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Assessment Form */}
         <Card>
@@ -141,74 +142,19 @@ const IrlAssessment = () => {
             </div>
 
             {/* Dimensions */}
-            {DIMENSION_ORDER.map((dimId) => {
-              const dimState = dimensions.find((d) => d.dimension === dimId)!;
-              const selectedLevel = dimState.level > 0 
-                ? IRL_DEFINITIONS[dimId].find((l) => l.level === dimState.level)
-                : null;
-
-              return (
-                <div key={dimId} className="space-y-4 p-4 rounded-lg bg-muted/30 border border-border">
-                  <div>
-                    <Label className="text-lg font-semibold">{DIMENSION_LABELS[dimId]}</Label>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {DIMENSION_SUMMARY[dimId]}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor={`level-${dimId}`}>Level (1-9)</Label>
-                    <Select
-                      value={dimState.level > 0 ? dimState.level.toString() : ""}
-                      onValueChange={(value) => updateDimension(dimId, "level", parseInt(value))}
-                    >
-                      <SelectTrigger id={`level-${dimId}`}>
-                        <SelectValue placeholder="Select level..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((level) => {
-                          const def = IRL_DEFINITIONS[dimId].find((l) => l.level === level)!;
-                          return (
-                            <SelectItem key={level} value={level.toString()}>
-                              Level {level}: {def.shortTitle}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {selectedLevel && (
-                    <div className="p-3 bg-card rounded-md border border-border">
-                      <p className="text-sm font-medium mb-1">{selectedLevel.shortTitle}</p>
-                      <p className="text-sm text-muted-foreground">{selectedLevel.description}</p>
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor={`justification-${dimId}`}>Justification (optional)</Label>
-                    <Textarea
-                      id={`justification-${dimId}`}
-                      placeholder="Why did you choose this level?"
-                      value={dimState.justification}
-                      onChange={(e) => updateDimension(dimId, "justification", e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor={`actions-${dimId}`}>Next Actions (optional)</Label>
-                    <Textarea
-                      id={`actions-${dimId}`}
-                      placeholder="What are your next steps for this dimension?"
-                      value={dimState.nextActions}
-                      onChange={(e) => updateDimension(dimId, "nextActions", e.target.value)}
-                      rows={3}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+            <div className="space-y-4">
+              {DIMENSION_ORDER.map((dimId) => {
+                const dimState = dimensions.find((d) => d.dimension === dimId)!;
+                return (
+                  <DimensionCard
+                    key={dimId}
+                    dimension={dimId}
+                    state={dimState}
+                    onUpdate={(field, value) => updateDimension(dimId, field, value)}
+                  />
+                );
+              })}
+            </div>
 
             <Button
               onClick={generateSummary}
@@ -233,6 +179,14 @@ const IrlAssessment = () => {
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Radar Chart */}
+              <div className="bg-muted/20 rounded-lg p-6">
+                <RadarChartView 
+                  dimensions={dimensions.map(d => ({ dimension: d.dimension, level: d.level }))} 
+                  size="large"
+                />
+              </div>
+
               <div>
                 <h3 className="font-semibold text-lg mb-2">Snapshot</h3>
                 <p className="text-muted-foreground">{summaryReport.snapshot}</p>

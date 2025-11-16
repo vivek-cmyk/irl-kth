@@ -65,6 +65,11 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        level: {
+          early: "hsl(var(--level-early))",
+          developing: "hsl(var(--level-developing))",
+          advanced: "hsl(var(--level-advanced))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
