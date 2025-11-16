@@ -4,6 +4,7 @@ export interface LevelDefinition {
   level: number;
   shortTitle: string;
   description: string;
+  indicators: string[];
 }
 
 export interface DimensionState {
