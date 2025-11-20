@@ -22,7 +22,6 @@ export const Footer = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
