@@ -8,10 +8,10 @@ export const Footer = () => {
           {/* Main Attribution */}
           <div className="space-y-2">
             <h2 className="text-sm font-semibold text-foreground">
-              Innovation Readiness Level (IRL) Framework
+              Innovation Readiness Level (IRL) Assessment Tool
             </h2>
             <p className="text-sm text-muted-foreground">
-              © KTH Royal Institute of Technology
+              Based on the framework by KTH Royal Institute of Technology
             </p>
           </div>
 
