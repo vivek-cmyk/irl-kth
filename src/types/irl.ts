@@ -10,8 +10,6 @@ export interface LevelDefinition {
 export interface DimensionState {
   dimension: DimensionId;
   level: number;
-  justification: string;
-  nextActions: string;
 }
 
 export interface AssessmentInput {
