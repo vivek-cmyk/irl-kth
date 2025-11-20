@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Copy, Check } from "lucide-react";
 import { DIMENSION_ORDER, DIMENSION_LABELS } from "@/data/irlDefinitions";
 import { DimensionId, DimensionState, SummaryReport } from "@/types/irl";
 import { RadarChartView } from "@/components/irl/RadarChartView";
 import { DimensionCard } from "@/components/irl/DimensionCard";
 import { IRL_DEFINITIONS } from "@/data/irlDefinitions";
+import { useToast } from "@/hooks/use-toast";
 
 const IrlAssessment = () => {
   const [assessmentDate, setAssessmentDate] = useState<string>(
@@ -23,6 +25,8 @@ const IrlAssessment = () => {
   );
 
   const [summaryReport, setSummaryReport] = useState<SummaryReport | null>(null);
+  const [copied, setCopied] = useState(false);
+  const { toast } = useToast();
 
   const updateDimension = (dimension: DimensionId, field: keyof DimensionState, value: any) => {
     setDimensions((prev) =>
@@ -41,25 +45,6 @@ const IrlAssessment = () => {
     const minLevel = Math.min(...levels);
     const bottleneckDim = dimensions.find((d) => d.level === minLevel)!;
 
-    // Generate snapshot
-    const highDims = dimensions.filter((d) => d.level >= 7).map((d) => DIMENSION_LABELS[d.dimension]);
-    const lowDims = dimensions.filter((d) => d.level <= 3).map((d) => DIMENSION_LABELS[d.dimension]);
-    
-    let snapshot = `Your startup shows `;
-    if (highDims.length > 0) {
-      snapshot += `strong progress in ${highDims.join(", ")} (level 7+)`;
-      if (lowDims.length > 0) {
-        snapshot += `, but `;
-      } else {
-        snapshot += `. `;
-      }
-    }
-    if (lowDims.length > 0) {
-      snapshot += `needs significant development in ${lowDims.join(", ")} (level 3 or below)`;
-    }
-    snapshot += `. Overall, your readiness levels range from ${minLevel} to ${Math.max(...levels)}.`;
-
-    // Generate bottleneck description
     const bottleneckLabel = DIMENSION_LABELS[bottleneckDim.dimension];
     const currentLevel = IRL_DEFINITIONS[bottleneckDim.dimension].find(
       (l) => l.level === bottleneckDim.level
@@ -68,151 +53,151 @@ const IrlAssessment = () => {
       (l) => l.level === bottleneckDim.level + 1
     );
 
-    const bottleneck = `${bottleneckLabel} is at level ${bottleneckDim.level} (${currentLevel.shortTitle}). ${currentLevel.description} This is currently your primary constraint limiting overall progress.`;
+    const bottleneck = `${bottleneckLabel} at Level ${bottleneckDim.level}: ${currentLevel.shortTitle}`;
 
-    // Generate recommendations based on next level
+    // Extract 3-5 indicators from next level for recommended focus
     const recommendedFocus: string[] = [];
-    if (nextLevel) {
-      recommendedFocus.push(
-        `Move towards level ${nextLevel.level}: ${nextLevel.shortTitle}`
-      );
-      recommendedFocus.push(`Focus on: ${nextLevel.description}`);
-      
-      // Add specific indicators from next level
-      if (nextLevel.indicators && nextLevel.indicators.length > 0) {
-        recommendedFocus.push(...nextLevel.indicators.slice(0, 3));
-      }
+    if (nextLevel && nextLevel.indicators && nextLevel.indicators.length > 0) {
+      recommendedFocus.push(...nextLevel.indicators.slice(0, 5));
     }
 
     setSummaryReport({
       date: assessmentDate,
       overallBottleneckLevel: minLevel,
       overallBottleneckDimension: bottleneckDim.dimension,
-      snapshot,
+      snapshot: "", // Removed verbose snapshot
       bottleneck,
-      recommendedFocus: recommendedFocus.slice(0, 5),
+      recommendedFocus,
     });
   };
+
+  const copyToClipboard = async () => {
+    if (!summaryReport) return;
+    
+    const text = `IRL Assessment - ${summaryReport.date}\n\nBottleneck: ${summaryReport.bottleneck}\n\nRecommended Focus:\n${summaryReport.recommendedFocus.map((item, idx) => `${idx + 1}. ${item}`).join('\n')}`;
+    
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    toast({
+      title: "Copied to clipboard",
+      description: "Summary report copied successfully",
+    });
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const hasSelections = dimensions.some((dim) => dim.level > 0);
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-foreground">IRL Assessment & Summary</h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Rate your startup across six readiness dimensions, then generate a brief summary and focus recommendation. 
-            Nothing is saved; copy the result into your own tracker if you want to keep it.
-          </p>
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <h1 className="text-4xl font-bold text-foreground">IRL Assessment</h1>
+          <div className="flex items-center justify-center gap-4">
+            <Label htmlFor="assessment-date" className="text-sm text-muted-foreground">
+              Date:
+            </Label>
+            <Input
+              id="assessment-date"
+              type="date"
+              value={assessmentDate}
+              onChange={(e) => setAssessmentDate(e.target.value)}
+              className="w-48"
+            />
+          </div>
         </div>
 
-        {/* Current Assessment Radar Chart */}
-        {dimensions.some(d => d.level > 0) && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Assessment Overview</CardTitle>
-              <CardDescription>Visual representation of your IRL assessment</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <RadarChartView 
-                dimensions={dimensions.map(d => ({ dimension: d.dimension, level: d.level }))} 
-                size="small"
-              />
+        {/* Live Radar Chart */}
+        {hasSelections && (
+          <Card className="bg-muted/30">
+            <CardContent className="pt-6">
+              <RadarChartView dimensions={dimensions} size="small" />
             </CardContent>
           </Card>
         )}
 
-        {/* Assessment Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Assessment Form</CardTitle>
-            <CardDescription>Complete all six dimensions to generate your summary</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* Date Input */}
-            <div className="space-y-2">
-              <Label htmlFor="assessment-date">Assessment Date</Label>
-              <Input
-                id="assessment-date"
-                type="date"
-                value={assessmentDate}
-                onChange={(e) => setAssessmentDate(e.target.value)}
+        {/* Assessment Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {DIMENSION_ORDER.map((dim) => {
+            const state = dimensions.find((d) => d.dimension === dim)!;
+            return (
+              <DimensionCard
+                key={dim}
+                dimension={dim}
+                state={state}
+                onUpdate={(field, value) => updateDimension(dim, field, value)}
               />
-            </div>
+            );
+          })}
+        </div>
 
-            {/* Dimensions */}
-            <div className="space-y-4">
-              {DIMENSION_ORDER.map((dimId) => {
-                const dimState = dimensions.find((d) => d.dimension === dimId)!;
-                return (
-                  <DimensionCard
-                    key={dimId}
-                    dimension={dimId}
-                    state={dimState}
-                    onUpdate={(field, value) => updateDimension(dimId, field, value)}
-                  />
-                );
-              })}
-            </div>
-
-            <Button
-              onClick={generateSummary}
-              disabled={!isFormValid()}
-              size="lg"
-              className="w-full"
-            >
+        {/* Generate Button */}
+        {isFormValid() && !summaryReport && (
+          <div className="flex justify-center">
+            <Button onClick={generateSummary} size="lg" className="px-8">
               Generate Summary Report
             </Button>
-          </CardContent>
-        </Card>
+          </div>
+        )}
 
         {/* Summary Report */}
         {summaryReport && (
-          <Card className="border-primary">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-2xl">IRL Summary Report</CardTitle>
-                <Badge variant="outline" className="text-base px-3 py-1">
-                  {summaryReport.date}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Radar Chart */}
-              <div className="bg-muted/20 rounded-lg p-6">
-                <RadarChartView 
-                  dimensions={dimensions.map(d => ({ dimension: d.dimension, level: d.level }))} 
+          <div className="space-y-6 pt-8 border-t">
+            <div className="flex items-center justify-between">
+              <h2 className="text-3xl font-bold text-foreground">Summary Report</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyToClipboard}
+                className="gap-2"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? "Copied" : "Copy"}
+              </Button>
+            </div>
+
+            {/* Large Radar Chart with Bottleneck Highlight */}
+            <Card className="bg-muted/30">
+              <CardContent className="pt-6">
+                <RadarChartView
+                  dimensions={dimensions}
                   size="large"
+                  highlightDimension={summaryReport.overallBottleneckDimension}
                 />
-              </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Snapshot</h3>
-                <p className="text-muted-foreground">{summaryReport.snapshot}</p>
-              </div>
-
-              <div className="p-4 bg-muted/50 rounded-lg border-l-4 border-warning">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-semibold text-lg">Bottleneck</h3>
-                  <Badge className="bg-warning text-warning-foreground">
-                    {DIMENSION_LABELS[summaryReport.overallBottleneckDimension]} – Level {summaryReport.overallBottleneckLevel}
+            {/* Bottleneck */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-3">
+                  <Badge variant="destructive" className="mt-1">
+                    Bottleneck
                   </Badge>
+                  <div>
+                    <p className="text-lg font-semibold">{summaryReport.bottleneck}</p>
+                  </div>
                 </div>
-                <p className="text-muted-foreground">{summaryReport.bottleneck}</p>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div>
-                <h3 className="font-semibold text-lg mb-3">Recommended Focus</h3>
+            {/* Recommended Focus */}
+            <Card>
+              <CardContent className="pt-6 space-y-3">
+                <h3 className="text-xl font-semibold">Recommended Focus</h3>
                 <ul className="space-y-2">
-                  {summaryReport.recommendedFocus.map((action, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-primary font-medium mt-0.5">•</span>
-                      <span className="text-muted-foreground">{action}</span>
+                  {summaryReport.recommendedFocus.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
+                        {idx + 1}
+                      </span>
+                      <span className="text-foreground">{item}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </div>
