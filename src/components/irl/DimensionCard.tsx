@@ -18,15 +18,12 @@ export const DimensionCard = ({ dimension, state, onUpdate }: DimensionCardProps
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Badge variant="outline" className="text-base font-bold cursor-help">
-                {dimension}
-              </Badge>
+              <div className="text-center cursor-help">
+                <h3 className="font-bold text-lg">{DIMENSION_LABELS[dimension]}</h3>
+              </div>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
-              <div className="space-y-1">
-                <p className="font-semibold">{DIMENSION_LABELS[dimension]}</p>
-                <p className="text-xs text-muted-foreground">{DIMENSION_SUMMARY[dimension]}</p>
-              </div>
+              <p className="text-xs text-muted-foreground">{DIMENSION_SUMMARY[dimension]}</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
