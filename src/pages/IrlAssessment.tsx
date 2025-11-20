@@ -115,7 +115,7 @@ const IrlAssessment = () => {
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-8">
+      <main className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-4">
@@ -249,7 +249,7 @@ const IrlAssessment = () => {
             </Card>
           </div>
         )}
-      </div>
+      </main>
 
       <Footer />
     </div>
