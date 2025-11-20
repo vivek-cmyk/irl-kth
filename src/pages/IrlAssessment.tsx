@@ -4,7 +4,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, RotateCcw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { DIMENSION_ORDER, DIMENSION_LABELS } from "@/data/irlDefinitions";
 import { DimensionId, DimensionState, SummaryReport } from "@/types/irl";
 import { RadarChartView } from "@/components/irl/RadarChartView";
@@ -87,12 +98,50 @@ const IrlAssessment = () => {
 
   const hasSelections = dimensions.some((dim) => dim.level > 0);
 
+  const resetAssessment = () => {
+    setDimensions(
+      DIMENSION_ORDER.map((dim) => ({
+        dimension: dim,
+        level: 0,
+      }))
+    );
+    setSummaryReport(null);
+    toast({
+      title: "Assessment reset",
+      description: "All selections cleared. You can start a new assessment.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-foreground">IRL Assessment</h1>
+          <div className="flex items-center justify-center gap-4">
+            <h1 className="text-4xl font-bold text-foreground">IRL Assessment</h1>
+            {hasSelections && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    Reset
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Reset Assessment?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will clear all your dimension selections and the summary report. This action cannot be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={resetAssessment}>Reset</AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
           <div className="flex items-center justify-center gap-4">
             <Label htmlFor="assessment-date" className="text-sm text-muted-foreground">
               Date:
