@@ -22,6 +22,7 @@ import { RadarChartView } from "@/components/irl/RadarChartView";
 import { DimensionCard } from "@/components/irl/DimensionCard";
 import { IRL_DEFINITIONS } from "@/data/irlDefinitions";
 import { useToast } from "@/hooks/use-toast";
+import { Footer } from "@/components/Footer";
 
 const IrlAssessment = () => {
   const [assessmentDate, setAssessmentDate] = useState<string>(
@@ -249,6 +250,8 @@ const IrlAssessment = () => {
           </div>
         )}
       </div>
+
+      <Footer />
     </div>
   );
 };
