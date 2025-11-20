@@ -19,7 +19,7 @@ export const DimensionCard = ({ dimension, state, onUpdate }: DimensionCardProps
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="text-center cursor-help">
-                <h3 className="font-bold text-lg">{DIMENSION_LABELS[dimension]}</h3>
+                <h2 className="font-bold text-lg">{DIMENSION_LABELS[dimension]}</h2>
               </div>
             </TooltipTrigger>
             <TooltipContent className="max-w-xs">
