@@ -119,7 +119,7 @@ const IrlAssessment = () => {
         {/* Header */}
         <div className="text-center space-y-4">
           <div className="flex items-center justify-center gap-4">
-            <h1 className="text-4xl font-bold text-foreground">IRL Assessment</h1>
+            <h1 className="text-4xl font-bold text-foreground">Innovation Readiness Level (IRL)</h1>
             {hasSelections && (
               <AlertDialog>
                 <AlertDialogTrigger asChild>
