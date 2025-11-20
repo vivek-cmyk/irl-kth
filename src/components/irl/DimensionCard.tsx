@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { LevelSelector } from "./LevelSelector";
@@ -44,28 +43,6 @@ export const DimensionCard = ({ dimension, state, onUpdate }: DimensionCardProps
                 levels={IRL_DEFINITIONS[dimension]}
                 selectedLevel={state.level}
                 onSelectLevel={(level) => onUpdate("level", level)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`justification-${dimension}`}>Justification (optional)</Label>
-              <Textarea
-                id={`justification-${dimension}`}
-                placeholder="Why did you choose this level?"
-                value={state.justification}
-                onChange={(e) => onUpdate("justification", e.target.value)}
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`actions-${dimension}`}>Next Actions (optional)</Label>
-              <Textarea
-                id={`actions-${dimension}`}
-                placeholder="What are your next steps for this dimension?"
-                value={state.nextActions}
-                onChange={(e) => onUpdate("nextActions", e.target.value)}
-                rows={3}
               />
             </div>
           </div>

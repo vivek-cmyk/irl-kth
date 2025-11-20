@@ -19,8 +19,6 @@ const IrlAssessment = () => {
     DIMENSION_ORDER.map((dim) => ({
       dimension: dim,
       level: 0,
-      justification: "",
-      nextActions: "",
     }))
   );
 
