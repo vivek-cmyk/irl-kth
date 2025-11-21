@@ -1,73 +1,90 @@
-# Welcome to your Lovable project
+# Innovation Readiness Level (IRL) Assessment Tool
 
-## Project info
+A web-based assessment tool for evaluating innovation readiness across six key dimensions, based on the framework developed by KTH Royal Institute of Technology.
 
-**URL**: https://lovable.dev/projects/a91efcee-8fdd-40ad-875b-e392a3a54710
+## Overview
 
-## How can I edit this code?
+The Innovation Readiness Level (IRL) Assessment Tool helps startups and innovators evaluate their readiness across six critical dimensions:
 
-There are several ways of editing your application.
+- **CRL** - Customer Readiness Level: How well the problem, customers, and value proposition are defined and validated
+- **TRL** - Technology Readiness Level: How mature and validated the core technology or solution is
+- **BRL** - Business Readiness Level: How clear and workable the business model and go-to-market are
+- **IPRL** - IP Readiness Level: How thought-through IP protection and freedom-to-operate are
+- **TMRL** - Team Readiness Level: How capable and aligned the core team is
+- **FRL** - Funding Readiness Level: How ready the startup is to secure and manage funding
 
-**Use Lovable**
+Each dimension is assessed on a scale from Level 1 (initial/limited) to Level 9 (mature/scalable), with detailed indicators and descriptions for each level.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a91efcee-8fdd-40ad-875b-e392a3a54710) and start prompting.
+## Features
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Interactive Assessment**: Select readiness levels for each of the six dimensions
+- **Live Visualization**: Real-time radar chart showing your readiness profile
+- **Bottleneck Identification**: Automatically identifies the dimension with the lowest readiness level
+- **Recommended Focus**: Provides actionable recommendations based on the next level indicators for the bottleneck dimension
+- **Summary Report**: Generate and copy a summary report with key findings and recommendations
+- **Date Tracking**: Record assessment dates for tracking progress over time
 
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Technologies
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Vite** - Build tool and development server
+- **TypeScript** - Type-safe JavaScript
+- **React** - UI library
+- **React Router** - Client-side routing
+- **shadcn-ui** - UI component library
+- **Tailwind CSS** - Utility-first CSS framework
+- **Recharts** - Chart library for data visualization
+- **TanStack Query** - Data fetching and state management
 
-## How can I deploy this project?
+## Getting Started
 
-Simply open [Lovable](https://lovable.dev/projects/a91efcee-8fdd-40ad-875b-e392a3a54710) and click on Share -> Publish.
+### Prerequisites
 
-## Can I connect a custom domain to my Lovable project?
+- Node.js (v18 or higher recommended)
+- npm or bun
 
-Yes, you can!
+### Installation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1. Clone the repository:
+git clone <YOUR_GIT_URL>
+cd irl-kth2. Install dependencies:ash
+npm install
+# or
+bun install
+3. Start the development server:
+npm run dev
+# or
+bun dev4. Open your browser and navigate to `http://localhost:5173`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+### Building for Production
+
+npm run build
+# or
+bun run buildThe production build will be in the `dist` directory.
+
+## Usage
+
+1. **Set Assessment Date**: Select the date for your assessment
+2. **Assess Each Dimension**: For each of the six dimensions, select the level that best describes your current state
+3. **View Live Progress**: As you make selections, a radar chart updates in real-time
+4. **Generate Report**: Once all dimensions are assessed, click "Generate Summary Report"
+5. **Review Results**: The report will show:
+   - Your overall readiness profile
+   - The bottleneck dimension (lowest level)
+   - Recommended focus areas from the next level indicators
+6. **Copy Report**: Use the copy button to save your assessment summary
+
+## License
+
+This project is licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0).
+
+**Source**: [kthinnovationreadinesslevel.com](https://kthinnovationreadinesslevel.com)
+
+**Note**: "Innovation Readiness Level" and "IRL" are trademarks of KTH Royal Institute of Technology.
+
+## Project Structure
+
+```
+src/
+├── components/
