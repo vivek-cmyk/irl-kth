@@ -55,7 +55,7 @@ bun install
 3. Start the development server:
 npm run dev
 # or
-bun dev4. Open your browser and navigate to `http://localhost:5173`
+bun dev4. Open your browser and navigate to `http://localhost:8080`
 
 ### Building for Production
 
